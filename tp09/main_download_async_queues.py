@@ -5,29 +5,11 @@ import concurrent.futures
 import asyncio
 import aiohttp
 
-
-async def download_and_save_aiohttp(url,log_file):
-    full_url = f"{url}{log_file}"
-    async with aiohttp.ClientSession() as session:
-        async with session.get(full_url) as response:
-            content = await response.text()
-            with open(log_file,'w') as f:
-                f.write(content)
-
-async def download_and_save_requests(url,log_file):
-    full_url = f"{url}{log_file}"
-
-    loop = asyncio.get_event_loop()
-    response = await loop.run_in_executor(None, requests.get, full_url)
-
-    with open(log_file,'w') as f:
-        f.write(response.text)
-
-
 async def download(q_download:asyncio.Queue,q_save:asyncio.Queue):
     while True:
         url,log_file = await q_download.get()
         full_url = f"{url}{log_file}"
+        
         async with aiohttp.ClientSession() as session:
             async with session.get(full_url) as response:
                 content = await response.text()
@@ -53,7 +35,7 @@ async def save(q_save:asyncio.Queue):
 
 async def main():
     start = time.perf_counter()
-    url = "https://logs.eolem.com/"
+    url = "http://logs.eolem.com/"
 
     queue_download = asyncio.Queue()    
     queue_save = asyncio.Queue()    
@@ -80,6 +62,12 @@ async def main():
     for href in all_log_href:
         t = url ,href
         queue_download.put_nowait(t)
+
+    await queue_download.join()
+    await queue_save.join()
+
+    [t.cancel() for t in tasks]
+
 
 
     end = time.perf_counter()         

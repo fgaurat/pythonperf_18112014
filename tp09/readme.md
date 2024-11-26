@@ -10,3 +10,6 @@ __temps__: 0.295s
 # Asyncio
 __temps__: 1.579s
 __temps__: 0.296s
+
+# AsyncioWorkers
+__temps__: 0.377s
