@@ -1,22 +1,14 @@
-import csv
-import sqlite3
+
+from CustomerDAO import CustomerDAO
 
 def main():
-    sql = """INSERT INTO customers_tbl(first_name,last_name,email,gender,ip_address) 
-    VALUES(?,?,?,?,?)
-    """
-    con = sqlite3.connect('customers_db.db')
+    
+    dao = CustomerDAO("customers_db.db")
+    
+    customers = dao.find_all()
 
-    with open('MOCK_DATA.csv') as f:
-        data = csv.DictReader(f)
-        for d in data:
-            del d["id"]
-            print(d)
-            values = list(d.values())
-            con.execute(sql,values)
-    
-    
-    con.commit()
-    con.close()
+    for customer in customers:
+        print(customer)
+
 if __name__=='__main__':
     main()
