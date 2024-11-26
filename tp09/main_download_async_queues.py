@@ -40,7 +40,14 @@ async def download(q_download:asyncio.Queue,q_save:asyncio.Queue):
         
 
 async def save(q_save:asyncio.Queue):
-    pass
+    while True:
+        d = await q_save.get()
+        log_file = d['log_file']
+        content = d['content']
+        with open(log_file,'w') as f:
+            f.write(content)
+        q_save.task_done()
+
 
 
 
